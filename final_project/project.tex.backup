@@ -1,0 +1,323 @@
+\documentclass[11pt]{article}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage[colorlinks=true ,urlcolor=blue,urlbordercolor={0 1 1}]{hyperref}
+%\usepackage{psfig}
+
+\newcommand{\handout}[6]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf UD120: Intro to Machine Learning  } \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #6  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\em #3 \hfill #4} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\em \hfill #5} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[5]{\handout{#1}{#2}{#3}{Scribes: #4}{#5}{Lecture #1}}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{question}[theorem]{Question}
+
+% 1-inch margins, from fullpage.sty by H.Partl, Version 2, Dec. 15, 1988.
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+%\renewcommand{\baselinestretch}{1.25}
+
+\DeclareMathOperator{\lca}{lca}
+\newcommand{\project}[3]{\handout{#1}{#2}{#3}{}{}{Project:#1}}
+
+\begin{document}
+
+\project{ Free Response Questions }{Fall 2016}{Kevin Mather}
+
+\section{Overview}
+
+A critical part of machine learning is making sense of your analysis process and communicating it to others. The questions below will help us understand your decision-making process and allow us to give feedback on your project. Please answer each question; your answers should be about 1-2 paragraphs per question. If you find yourself writing much more than that, take a step back and see if you can simplify your response!
+
+When your evaluator looks at your responses, he or she will use a specific list of rubric items to assess your answers. \href{https://review.udacity.com/#!/rubrics/27/view}{Here is the link} to that rubric: Link to the rubric Each question has one or more specific rubric items associated with it, so before you submit an answer, take a look at that part of the rubric. If your response does not meet expectations for all rubric points, you will be asked to revise and resubmit your project. Make sure that your responses are detailed enough that the evaluator will be able to understand the steps you took and your thought processes as you went through the data analysis.
+
+Once you’ve submitted your responses, your coach will take a look and may ask a few more focused follow-up questions on one or more of your answers.  
+
+We can’t wait to see what you’ve put together for this project!
+
+
+\section{Questions}
+\begin{question}
+ Summarize for us the goal of this project and how machine learning is useful in trying to accomplish it. As part of your answer, give some background on the dataset and how it can be used to answer the project question. Were there any outliers in the data when you got it, and how did you handle those?  [relevant rubric items: “data exploration”, “outlier investigation”]
+\end{question}
+The goal of this project is to be able to identify people of interest in the fraud that happened at Enron between 2000-2002. We can accomplish this by using a machine learning to build a classifier to identify the people that might have been involved in the fraud that accrued. The data that will be used for the classifier is from the CMU Enron data set which contains a large collection of emails from senior management of Enron. Yes there was a major outlier called ``TOTAL'' which was removed after we first inspected the data and made some plots.
+
+
+\begin{question}
+ What features did you end up using in your POI identifier, and what selection process did you use to pick them? Did you have to do any scaling? Why or why not? As part of the assignment, you should attempt to engineer your own feature that does not come ready-made in the dataset -- explain what feature you tried to make, and the rationale behind it. (You do not necessarily have to use it in the final analysis, only engineer and test it.) In your feature selection step, if you used an algorithm like a decision tree, please also give the feature importances of the features that you use, and if you used an automated feature selection function like SelectKBest, please report the feature scores and reasons for your choice of parameter values.  [relevant rubric items: “create new features”, “properly scale features”, “intelligently select feature”]
+\end{question}
+
+We selected the following features \[[salary,~ bonus,~ total\_stock\_value,~ expenses,~ exercised\_stock\_options]\] as well as the two custom features we made \[\left[\dfrac{bonus}{\log(salary)},~\dfrac{shared\_receipt\_with\_poi+3*from\_poi\_to\_this\_person}{to\_messages}\right]\]
+We picked these features after see what possible feature had enough available data, greater then $55\%$, for each person. Then we pick just decided to pick the above six features from the available eleven feature that were left after our cutoff since we feel like someone what would commit fraud would want to line there pockets and expenses the company as much as possible before the company collapsed. We also decided to add the feature $\dfrac{bonus}{\log(salary)}$ since if someone knew that the company was going to collapse then they might try to hide the fact that they knew what was happening by taking a large bribe in the form of a large bonus that is a order of magnitude grater then or equal to there normal salary. We also would suspect that someone was a person of interest if a large proposition of email is from other know POI.
+
+We did not need to do any feature scaling since the decision trees are not affected from scaling hence AdaBoost is not affected from feature scaling.
+
+\begin{question}
+ What algorithm did you end up using? What other one(s) did you try? How did model performance differ between algorithms?  [relevant rubric item: “pick an algorithm”]
+\end{question}
+In the end we ended up using the AdaBoost ensemble algorithm. We also tried Naive Bayes, a single decision tree, multiple decision trees in the form of random forest as well as SVM before finding that AdaBoost was a better performer.
+
+
+\begin{question}
+ What does it mean to tune the parameters of an algorithm, and what can happen if you don’t do this well?  How did you tune the parameters of your particular algorithm? (Some algorithms do not have parameters that you need to tune -- if this is the case for the one you picked, identify and briefly explain how you would have done it for the model that was not your final choice or a different model that does utilize parameter tuning, e.g. a decision tree classifier).  [relevant rubric item: “tune the algorithm”]
+\end{question}
+
+
+
+\begin{question}
+ What is validation, and what’s a classic mistake you can make if you do it wrong? How did you validate your analysis?  [relevant rubric item: “validation strategy”]
+\end{question}
+
+
+
+\begin{question}
+ Give at least 2 evaluation metrics and your average performance for each of them.  Explain an interpretation of your metrics that says something human-understandable about your algorithm’s performance. [relevant rubric item: “usage of evaluation metrics”]
+\end{question}
+
+
+
+A BST can be viewed is a model of computation where data must be stored as keys in a binary search tree. Each key has a pointer to its parent (unless it is the root) and a pointer to its left and right children, or a null pointer if they do not exist. The value of the key stored in the left child of a node must be less than or equal to the value of the key  stored at the node, which is in turn less than or equal to the value of the key stored at the right child.
+The model supports the following unit-cost operations:
+
+\begin{itemize}
+\item Walk to left child.
+\item Walk to right child.
+\item Walk to parent.
+\item Rotate node $x$. 
+\end{itemize}
+
+\begin{center}
+%\includegraphics{rotation.eps}
+\end{center}
+
+The first three operations only change a pointer into the tree. The last operation updates the tree itself.
+
+
+These models support the query  \emph{Search}$(x)$, which starts with a pointer to the root and can use the above operations, but must at some point visit the node with key $x$. In these two lectures we will assume for convenience that queries are always successful. We will also ignore insertions and deletions, for ease of definitions and proofs.
+
+\subsection{Is There a Best BST?}
+We already know of a number of self-balancing BSTs that take $O(\log n)$ per search. These include AVL trees and red-black trees. 
+
+{\bf Question:} Is $O(\log n)$ the best possible?
+
+{\bf Answer:} Yes -- in the worst case. Any tree on $n$ items must have depth $\Omega(\log n)$, and an adversary could choose to search for the key located at the largest depth every round. However, in some cases we can do better. In general, we will consider a sequence of searches, and consider the best possible total time to complete the entire sequence.
+
+\subsection{Search Sequences}
+
+We will assume the $n$ keys stored in the tree have values $\{1, 2, \dots n\}$. We will consider sequences of search operations $x_1, x_2, \dots x_m$, ordered by time. Some sequences are intuitively "easier" than other sequences. For example, If $x_1 = x_2 = \dots = x_m = X$, then any search tree with $X$ at the root can achieve constant time access per search. 
+
+We will investigate some possible properties of BST algorithms that guarantee certain access time bounds for specific input sequences.
+
+\subsection{Sequential Access Property}
+
+A BST algorithm has the \emph{Sequential Access Property} if the search sequence $\{1, 2 \dots n\}$ takes an amortized $O(1)$ time per operation.
+
+This property seems easy to achieve, as it constitutes performing an in-order tree traversal in $O(n)$ time. It is slightly more complicated in this model of computation, as all searches must start at the root. However, starting at the last key can be simulated by rotating to the root, which we will not prove in this lecture. 
+
+\subsection{Dynamic Finger Property}
+
+A BST algorithm has the \emph{Dynamic Finger Property} if, for any sequence of operation $x_1, x_2, \dots x_m$, the amortized access time for $x_k$ is $O(|(x_k - x_{k-1})|)$.
+
+This is a generalization of the Sequential Access Property. The Dynamic Finger Property tells me that as long as my queries remain close in space, the time needed will be small.
+
+The Dynamic Finger Property can be achieved by a BST with some difficulty. In a more general pointer machine model, this is easy to achieve with a level-linked tree, a BST with pointers between adjacent nodes at every level.
+
+\subsection{Static Optimality/Entropy Bound}
+
+A BST algorithm is \emph{Statically Optimal} if, given an input sequence where element $k$ appears a $p_k$ fraction of the time, the amortized access time per search is 
+
+$$\large{O\left(\sum_{k=1}^n p_k \log \frac{1}{p_k}\right)}$$
+
+This is the information theoretic lower bound for the amortized access time for a static tree, hence the name static optimality. 
+
+\subsection{Working Set Property}
+
+A BST algorithm has the \emph{Working Set Property} if for a given search for $x_i$, if $t_i$ distinct elements were accessed since the last access of $x_i$, the search takes an amortized $O(\log t_i)$.
+
+The Working Set Property implies Static Optimality (although we will not prove it). If a few items are accessed often in some subsequence, the Working Set Property guarantees that these accesses are fast.
+
+The Working Set Property says that keys accessed recently are easy to access again. The Dynamic Finger Property says that keys close in space to a key recently accessed are also easy to access. The following property will combine these.
+
+\subsection{Unified Property}
+
+A BST algorithm has the \emph{Unified Property} \cite{iacono} if, given that $t_{i,j}$ unique keys were accessed between $x_i$ and $x_j$, then search $x_j$ costs an amortized
+
+$$O(\log( \min_{i<j} (|x_i - x_j| + t_{i,j} + 2)))$$
+
+This is a generalization of both the Working Set Property and the Dynamic Finger Property, and implies both. If there is a key that was accessed somewhat recently and is somewhat close in space, this access will be cheap.
+
+It is unknown whether or not there is any BST that achieves the Unified Property. This property can be achieved by a pointer machine data structure \cite{iacono}. The best upper bound known is a BST that achieves an additive $O(\log \log n)$ factor on top of every operation. 
+
+\subsection{Dynamic Optimality}
+
+A BST algorithm is \emph{Dynamically Optimal} if the total cost of a sequence of searches is within a multiplicative $O(1)$ factor of the optimal BST algorithm for that sequence. The optimal is the offline optimal, the min cost over all BST algorithms once a particular sequence is known. Dynamic Optimality implies that a particular online BST algorithm can achieve a constant factor approximation of the cost of the offline optimal algorithm.
+
+{\bf Open Questions:} Is there an online dynamically optimal BST algorithm? Is there an online dynamically optimal pointer machine algorithm (either competitive with the best offline BST or offline pointer machine?)
+
+{\bf Answer:} We don't know any of the above. The best known is an online $O(\log \log n)$-competitive algorithm, which we will study next lecture. However, there are some candidates that are conjectured to be dynamically optimal, although a proof is not known.
+
+\section{Splay Trees}
+Splay trees were introduced by Sleator and Tarjan \cite{st} in 1985. In a splay tree, a search for key $x$ will start at the root and go down the tree until the key $x$ is reached. Then, $x$ is moved to the root using the following two "splay" operations, the \emph{zig-zig} and the \emph{zig-zag}:
+
+\begin{center}
+%\includegraphics{zigzig.eps}
+%\includegraphics{zigzag.eps}
+\end{center}
+
+In the zig-zig, we rotate $y$ and then rotate $x$. In the zig-zag step, we rotate $x$ twice. Splay trees differ from the "Move-to-root" algorithm because of the zig-zig operation, instead of simply rotating $x$ twice. We perform these operations until $x$ is either at the root of the tree, or it is a child of the root, in which case we perform one single rotation on $x$.
+
+
+\subsection{Analytic properties}
+Splay trees have been shown to have some of the properties discussed above. In particular, splay trees:
+
+\begin{itemize}
+\item are statically optimal, \cite{st}
+\item have the Working Set Property, \cite{st}
+\item have the Dynamic Finger Property. This was proven in 2000 by Cole et. al. \cite{cole1}\cite{cole2}
+\end{itemize}
+
+It is not known whether splay trees are dynamically optimal, or even if they satisfy the Unified Property. They were conjectured to be dynamically optimal in the original paper \cite{st}, but this conjecture is still open.
+
+\section{Geometric View}
+
+It turns out that there is a very neat geometric view of binary search tree algorithms,
+from \cite{dhikp}.
+Suppose on the key set $\{1,2,\dotsc,n\}$, we have an access sequence $x_1,\dotsc,x_m$.
+We can represent this using the points $(x_i, i)$.
+
+\paragraph{Example:} If our key set is $\{1,2,3,4\}$ and our access sequence is
+$3,1,4,2$, we would draw this picture:
+\begin{center}
+%\includegraphics{geoview-ex-1.eps}
+\end{center}
+We could perform the access with this static binary tree:
+\begin{center}
+%\includegraphics{geoview-ex-2.eps}
+\end{center}
+In the first access, we only have to touch the $3$.
+In the second access, we have to touch the $3$ and the $1$.
+In the third access, we have to touch the $3$ and the $4$.
+In the fourth access, we have to touch the $3$, the $1$, and the $2$.
+We also represent these touches geometrically. If we touch item $x$
+and time $t$, then we draw a point at $(x,t)$.
+\begin{center}
+%\includegraphics{geoview-ex-3.eps}
+\end{center}
+
+In general, we can represent a BST algorithm for a given input sequence
+by drawing a point for each item that gets touched. We consider the cost of
+the algorithm to be the total number of points; when running the BST, there is never
+any reason to touch a node more than a constant number of times per search. Thus,
+the number of points is within a constant factor of the cost of the BST.
+
+\paragraph{Definition.} We say that a point set is \emph{arborally satisfied} if the following property holds:
+for any pair of points that do not both lie on the same horizontal or vertical line, there exists
+a third point which lie in the rectangle spanned by the first two points (either inside or on the boundary).
+
+Note that the point set for the BST given in the example is arborally satisfied. In general, the following holds:
+
+\paragraph{Theorem.} A point set containing the points $(x_i, i)$
+is arborally satisfied if and only if it corresponds to a valid
+BST for the input sequence $x_1,\dotsc,x_m$.
+
+\paragraph{Corollary.} The optimum binary search tree execution is equivalent to the smallest arborally satisfied set containing the input.
+
+\paragraph{OPEN:} What is the computational complexity of finding the smallest arborally satisfied set? Is there an $O(1)$-approximation?
+
+\paragraph{Proof.} First, we prove that the point set for any valid BST algorithm
+is arborally satisfied. Consider points $(x, i)$ and $(y, j)$, where $x$ is touched
+at time $i$ and $y$ is touched at time $j$. Assume by symmetry that $x < y$ and $i < j$.
+We need to show that there exists a third point in the rectangle with corners as $(x, i)$ and $(y, j)$.
+Also let $\lca_t(a,b)$ denote the least common ancestor of nodes $a$ and $b$ right before time $t$.
+We have a few cases:
+\begin{itemize}
+\item If $\lca_i(x, y) \ne x$, then we can use the point $(\lca_i(x, y), i)$, since $\lca_i(x,y)$ must
+have been touched if $x$ was.
+\item If $\lca_j(x, y) \ne y$, then we can use the point $(\lca_j(x, y), j)$.
+\item If neither of the above two cases hold, then we must have $x$ be an ancestor
+of $y$ right before time $i$ and $y$ be an ancestor of $x$ right before time $j$.
+Then at some time $k$ ($i \le k < j$), $y$ must have been rotated above $x$,
+so we can use the point $(y, k)$.
+\end{itemize}
+
+
+Next, we show the other direction: given an arborally satisfied point set, we can construct a valid BST corresponding to that point set.
+Now we will organize our BST into a treap which is organized in heap-order by next-touch-time. Note that next-touch-time has ties and is thus not uniquely defined, but this isn't a problem as long as we pick a way to break ties. When we reach time $i$, the nodes touched form a connected subtree at the top, by the heap ordering property. We can now take this subtree, assign new next-touch-times and rearrange into a new local treap. Now, if a pair of nodes, $x$ and $y$, stradle the boundary between the touched and untouched part of the treap, then if $y$ is to be touched sooner than $x$ then $(x,now) \rightarrow (y,next-touch(y))$ is an unsatisfied rectangle because the leftmost such point would be the right child of $x$, not $y$. $\blacksquare$
+
+\subsection{Greedy Algorithm} 
+	There is a simple greedy algorithm to construct arborally satisfiable sets. We consider the point set one row at a time. Now add any points to that row that would be necessary to make the current subset satisfiable. This is repeated until all rows of points are satisfied. It is conjectured that this greedy algorithm is $O(Opt)$ or event $Opt + O(m)$.
+
+\paragraph{Theorem.} The online arborally satisfiable set algorithm implies an online BST algorithm with $O(1)$ slowdown.
+
+\paragraph{Corollary. } If the greedy algorithm is $O(Opt)$, then we have an algorithm for dynamic optimality.
+
+\paragraph{Proof. } First, store the touched nodes from an access in a split tree. Split trees can move a node to the root, and then delete that node leaving two trees in amortized $O(1)$ time. This allows us to perform the reordering and separation based on touched nodes for all $n$ nodes in only $O(n)$ time. Now we can essentially construct a BST which is essentially a treap of split trees ordered by the previously touched node. These trees allow us to efficently touch the predecessor and successor nodes in the parent tree when touching a node in the split tree. Thus we are able to simulate the decisions from the arborally satisfiable set algorithm with only only a constant factor slowdown. 
+
+\bibliographystyle{alpha}
+
+\begin{thebibliography}{9}
+
+\bibitem{cole1}
+Richard Cole, Bud Mishra, Jeanette P. Schmidt, Alan Siegel:
+\emph{On the Dynamic Finger Conjecture for Splay Trees. Part I: Splay Sorting log n-Block Sequences.}
+SIAM J. Comput. 30(1): 1-43 (2000)
+
+\bibitem{cole2}
+Richard Cole:
+\emph{On the Dynamic Finger Conjecture for Splay Trees. Part II: The Proof.}
+SIAM J. Comput. 30(1): 44-85 (2000)
+
+\bibitem{dhikp}
+Erik D. Demaine, Dion Harmon, John Iacono, Daniel M. Kane, Mihai Patrascu:
+\emph{The geometry of binary search trees.}
+SODA 2009: 496-505
+
+\bibitem{iacono}
+John Iacono:
+\emph{Alternatives to splay trees with O(log n) worst-case access times.}
+SODA 2001: 516-522
+
+\bibitem{st}
+Daniel Dominic Sleator, Robert Endre Tarjan:
+\emph{Self-Adjusting Binary Search Trees}
+J. ACM 32(3): 652-686 (1985)
+
+\end{thebibliography}
+
+\end{document}
